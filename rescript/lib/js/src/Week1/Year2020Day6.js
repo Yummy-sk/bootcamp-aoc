@@ -2,73 +2,59 @@
 'use strict';
 
 var Fs = require("fs");
+var Belt_Id = require("rescript/lib/js/belt_Id.js");
+var Belt_Set = require("rescript/lib/js/belt_Set.js");
+var Caml_obj = require("rescript/lib/js/caml_obj.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Belt_SetString = require("rescript/lib/js/belt_SetString.js");
 
-function parseInput(param) {
-  return Fs.readFileSync("../../../../input/Week1/Year2020Day6.sample.txt", "utf8").trim().split("\n\n").map(function (str) {
-              return str.split("\n");
-            });
-}
+var cmp = Caml_obj.caml_compare;
 
-function splitQuestions(questions) {
-  return Belt_Array.map(questions, (function (question) {
-                return Belt_Array.map(question, (function (str) {
+var StrCmp = Belt_Id.MakeComparable({
+      cmp: cmp
+    });
+
+function parseInput(param) {
+  return Belt_Array.map(Fs.readFileSync("../../../../input/Week1/Year2020Day6.sample.txt", "utf8").trim().split("\n\n").map(function (str) {
+                  return str.split("\n");
+                }), (function (arr) {
+                return Belt_Array.map(arr, (function (str) {
                               return str.split("");
                             }));
               }));
 }
 
-var collectQuestion = Belt_Array.concatMany;
-
-function collectQuestions(questions) {
-  return Belt_Array.map(questions, collectQuestion);
-}
-
-function getUniqueQuestion(question) {
-  return Belt_SetString.toArray(Belt_SetString.fromArray(question));
-}
-
-function getUniqueQuestions(questions) {
-  return Belt_Array.map(questions, getUniqueQuestion);
-}
-
-function getCountOfQuestions(questions) {
-  return Belt_Array.map(questions, (function (question) {
-                return question.length;
+function makeUnique(groups) {
+  return Belt_Array.map(groups, (function (group) {
+                return Belt_SetString.toArray(Belt_SetString.fromArray(group));
               }));
 }
 
-function getInfoOfGroup(questions) {
-  return Belt_Array.map(questions, (function (question) {
-                var numberOfPeople = question.length;
-                var collectedQuestion = Belt_Array.concatMany(question);
-                return {
-                        num: numberOfPeople,
-                        ques: collectedQuestion
-                      };
+function getAllAnsweredQuestions(groups) {
+  return Belt_Array.map(groups, (function (group) {
+                return Belt_Option.getExn(Belt_Array.reduce(group, Belt_Array.get(group, 0), (function (acc, person) {
+                                  if (acc === undefined) {
+                                    return ;
+                                  }
+                                  var prev = Belt_Set.fromArray(acc, StrCmp);
+                                  var curr = Belt_Set.fromArray(person, StrCmp);
+                                  return Belt_Set.toArray(Belt_Set.intersect(prev, curr));
+                                })));
               }));
 }
 
-function checkQuestionsAreAllAnswered(infos) {
-  return Belt_Array.map(infos, (function (info) {
-                var ques = info.ques;
-                var num = info.num;
-                var uniqueQuestion = Belt_SetString.toArray(Belt_SetString.fromArray(ques));
-                return uniqueQuestion.map(function (question) {
-                            var count = ques.filter(function (q) {
-                                  return q === question;
-                                }).length;
-                            return count === num;
-                          });
-              }));
+function parseData(solType) {
+  if (solType) {
+    return getAllAnsweredQuestions(parseInput(undefined));
+  } else {
+    return makeUnique(Belt_Array.map(parseInput(undefined), Belt_Array.concatMany));
+  }
 }
 
-function countAnsweredQuestions(questions) {
-  return Belt_Array.map(questions, (function (question) {
-                return question.filter(function (q) {
-                            return q;
-                          }).length;
+function countAnswers(groups) {
+  return Belt_Array.map(groups, (function (group) {
+                return group.length;
               }));
 }
 
@@ -78,34 +64,33 @@ function getSumOfCounts(counts) {
               }));
 }
 
-function solutionPart1(param) {
-  var questions = Belt_Array.map(Belt_Array.map(splitQuestions(parseInput(undefined)), collectQuestion), getUniqueQuestion);
-  console.log(getSumOfCounts(Belt_Array.map(questions, (function (question) {
-                  return question.length;
+function solve(solType) {
+  var groups = parseData(solType);
+  console.log(getSumOfCounts(Belt_Array.map(groups, (function (group) {
+                  return group.length;
                 }))));
   
 }
 
-function solutionPart2(param) {
-  console.log(getSumOfCounts(countAnsweredQuestions(checkQuestionsAreAllAnswered(getInfoOfGroup(splitQuestions(parseInput(undefined)))))));
-  
+function solution(solType) {
+  if (solType) {
+    return solve(/* Solution2 */1);
+  } else {
+    return solve(/* Solution1 */0);
+  }
 }
 
-solutionPart1(undefined);
+solve(/* Solution1 */0);
 
-solutionPart2(undefined);
+solve(/* Solution2 */1);
 
+exports.StrCmp = StrCmp;
 exports.parseInput = parseInput;
-exports.splitQuestions = splitQuestions;
-exports.collectQuestion = collectQuestion;
-exports.collectQuestions = collectQuestions;
-exports.getUniqueQuestion = getUniqueQuestion;
-exports.getUniqueQuestions = getUniqueQuestions;
-exports.getCountOfQuestions = getCountOfQuestions;
-exports.getInfoOfGroup = getInfoOfGroup;
-exports.checkQuestionsAreAllAnswered = checkQuestionsAreAllAnswered;
-exports.countAnsweredQuestions = countAnsweredQuestions;
+exports.makeUnique = makeUnique;
+exports.getAllAnsweredQuestions = getAllAnsweredQuestions;
+exports.parseData = parseData;
+exports.countAnswers = countAnswers;
 exports.getSumOfCounts = getSumOfCounts;
-exports.solutionPart1 = solutionPart1;
-exports.solutionPart2 = solutionPart2;
-/*  Not a pure module */
+exports.solve = solve;
+exports.solution = solution;
+/* StrCmp Not a pure module */

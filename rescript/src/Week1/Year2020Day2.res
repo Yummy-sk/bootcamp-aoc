@@ -6,6 +6,9 @@ type passwordInfo = {
   password: string
 }
 
+
+type partType = Part1 | Part2
+
 let getInputData = () => 
   Node.Fs.readFileAsUtf8Sync("../../../../input/Week1/Year2020Day2.sample.txt") 
   ->Js.String2.trim
@@ -59,18 +62,22 @@ let countValidPasswords = (status) =>
   ->Belt.Array.length
 
 
-let part1 = () => 
-  parseInputData()
-  ->checkLetterCountIsValid
-  ->countValidPasswords
-  ->Js.log
+let solution = (partType) =>
+  switch partType {
+    | Part1 => {
+        parseInputData()
+        ->checkLetterCountIsValid
+        ->countValidPasswords
+        ->Js.log      
+    }
+    | Part2 => {
+        parseInputData()
+        ->checkLetterPositionIsValid
+        ->countValidPasswords
+        ->Js.log
+    }
+  }
 
 
-let part2 = () => 
-  parseInputData()
-  ->checkLetterPositionIsValid
-  ->countValidPasswords
-  ->Js.log
-
-part1()
-part2()
+Part1->solution
+Part2->solution

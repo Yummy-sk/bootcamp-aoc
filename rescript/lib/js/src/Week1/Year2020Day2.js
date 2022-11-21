@@ -18,7 +18,7 @@ function parseInputData(param) {
                         RE_EXN_ID: "Match_failure",
                         _1: [
                           "Year2020Day2.res",
-                          19,
+                          22,
                           8
                         ],
                         Error: new Error()
@@ -33,7 +33,7 @@ function parseInputData(param) {
                         RE_EXN_ID: "Match_failure",
                         _1: [
                           "Year2020Day2.res",
-                          20,
+                          23,
                           8
                         ],
                         Error: new Error()
@@ -77,31 +77,29 @@ function countValidPasswords(status) {
               })).length;
 }
 
-function part1(param) {
-  var status = checkLetterCountIsValid(parseInputData(undefined));
-  console.log(Belt_Array.keep(status, (function (x) {
+function solution(partType) {
+  if (partType) {
+    var status = checkLetterPositionIsValid(parseInputData(undefined));
+    console.log(Belt_Array.keep(status, (function (x) {
+                return x;
+              })).length);
+    return ;
+  }
+  var status$1 = checkLetterCountIsValid(parseInputData(undefined));
+  console.log(Belt_Array.keep(status$1, (function (x) {
               return x;
             })).length);
   
 }
 
-function part2(param) {
-  var status = checkLetterPositionIsValid(parseInputData(undefined));
-  console.log(Belt_Array.keep(status, (function (x) {
-              return x;
-            })).length);
-  
-}
+solution(/* Part1 */0);
 
-part1(undefined);
-
-part2(undefined);
+solution(/* Part2 */1);
 
 exports.getInputData = getInputData;
 exports.parseInputData = parseInputData;
 exports.checkLetterCountIsValid = checkLetterCountIsValid;
 exports.checkLetterPositionIsValid = checkLetterPositionIsValid;
 exports.countValidPasswords = countValidPasswords;
-exports.part1 = part1;
-exports.part2 = part2;
+exports.solution = solution;
 /*  Not a pure module */

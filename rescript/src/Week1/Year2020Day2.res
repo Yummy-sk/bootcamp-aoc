@@ -16,7 +16,7 @@ let getInputData = () =>
   ->Js.String2.split("\n")
 
 // 원하는 입력값을 위해 파싱하는 함수
-// 1-3 a: abcde -> {upper: 1, lower: 3, letter: "a", password: "abcde"}
+// 1-3 a: abcde -> {lower: 1, upper: 3, letter: "a", password: "abcde"}
 let parseInputData = () => {
   open Belt
 

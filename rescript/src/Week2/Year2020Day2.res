@@ -10,12 +10,31 @@ type passwordInfo = {
 type partType = Part1 | Part2
 
 
-
-
 let getInputData = () => 
-  Node.Fs.readFileAsUtf8Sync("input/Week1/Year2020Day2.sample.txt") 
-  ->Js.String2.trim
+  Input.readFile("input/Week1/Year2020Day2.sample.txt") 
   ->Js.String2.split("\n")
+
+
+let formatData = (line) => {
+  open Belt
+  switch (line->Js.String2.split(" ")) {
+    | [range, letter, password] => {
+
+      switch (range->Js.String2.split("-")) {
+        | [lower, upper] => {
+          {
+            upper: upper->Int.fromString->Option.getExn,
+            lower: lower->Int.fromString->Option.getExn,
+            letter: letter->Js.String2.replaceByRe(%re("/:/g"), ""),
+            password
+          }
+        }
+        | _ => failwith("Invalid range")
+      }
+    }
+    | _ => failwith("Invalid line")
+  }
+}
 
 // 원하는 입력값을 위해 파싱하는 함수
 // 1-3 a: abcde -> {lower: 1, upper: 3, letter: "a", password: "abcde"}
@@ -23,48 +42,30 @@ let parseInputData = () => {
   open Belt
 
   getInputData()
-  ->Array.map(line => {
-    let [range, letter, password] = Js.String2.split(line, " ")
-    let [lower, upper] = Js.String2.split(range, "-")
-
-    // switch Js.String2.split(line, " ") {
-    //   | [] => ""
-    //   | [range, letter, password ] => fn()
-    //   | _ => fn()
-    // }
-
-    {
-      upper: Int.fromString(upper)->Option.getExn,
-      lower: Int.fromString(lower)->Option.getExn,
-      letter: letter->Js.String2.replaceByRe(%re("/:/g"), ""),
-      password: password
-    }
-  })
+  ->Array.map(line => line->formatData)
 }
 
-// 배열 [| |] , 리스트 [ ]
-// 배열 [ ] , 리스트 list{ }
 
 // part1을 위해 해당 letter가 최소 및 최대 범위에 있는지 확인하는 함수
 let checkLetterCountIsValid = (infos) => {
   open Belt
 
   infos
-  ->Array.map(info => {
+  ->Array.keep(info => {
     let {upper, lower, letter, password} = info
-    let letterCount = password->Js.String2.split(letter)->Array.length - 1
+    let letterCount = password->Js.String2.split("")->Array.keep(x => x == letter)->Array.length
 
     letterCount >= lower && letterCount <= upper
   })
 }
-// @return array<boolean> ? 
-// keep 
+
+
 // part2를 위해 각 포지션에 유효한 letter가 있는지 확인하는 함수
 let checkLetterPositionIsValid = (infos) => {
     open Belt
 
     infos
-    ->Array.map(info => {
+    ->Array.keep(info => {
       let {upper, lower, letter, password} = info
       let letterAtLower = password->Js.String2.get(lower - 1) == letter
       let letterAtUpper = password->Js.String2.get(upper - 1) == letter 
@@ -76,7 +77,6 @@ let checkLetterPositionIsValid = (infos) => {
 // 유요한 비밀번호 갯수를 카운트 합니다.
 let countValidPasswords = (status) => 
   status
-  ->Belt.Array.keep(x => x) // keep(idFn), keepMap(idFn)
   ->Belt.Array.length
 
 

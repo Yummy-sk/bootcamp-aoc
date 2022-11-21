@@ -11,7 +11,8 @@ function readFile(path) {
     })());
   var parsedRootPath = dirname.replace(/lib\/js/g, "");
   var restOfPath = path.trim().replace(/^\//, "");
-  return Fs.readFileSync(parsedRootPath + "/" + restOfPath, "utf8");
+  var fullPath = parsedRootPath + "/" + restOfPath;
+  return Fs.readFileSync(fullPath, "utf8").trim();
 }
 
 exports.readFile = readFile;

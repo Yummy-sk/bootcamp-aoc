@@ -14,5 +14,6 @@ let readFile = (path) => {
   let fullPath = `${parsedRootPath}/${restOfPath}`;
 
   // 파일을 읽어 리턴한다.
-  Node.Fs.readFileAsUtf8Sync(fullPath);
+  Node.Fs.readFileAsUtf8Sync(fullPath)
+  ->Js.String2.trim;
 }

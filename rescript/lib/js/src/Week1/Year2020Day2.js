@@ -7,7 +7,7 @@ var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 
 function getInputData(param) {
-  return Fs.readFileSync("../../../../input/Week1/Year2020Day2.sample.txt", "utf8").trim().split("\n");
+  return Fs.readFileSync("input/Week1/Year2020Day2.sample.txt", "utf8").trim().split("\n");
 }
 
 function parseInputData(param) {
@@ -18,7 +18,7 @@ function parseInputData(param) {
                         RE_EXN_ID: "Match_failure",
                         _1: [
                           "Year2020Day2.res",
-                          25,
+                          27,
                           8
                         ],
                         Error: new Error()
@@ -33,7 +33,7 @@ function parseInputData(param) {
                         RE_EXN_ID: "Match_failure",
                         _1: [
                           "Year2020Day2.res",
-                          26,
+                          28,
                           8
                         ],
                         Error: new Error()

@@ -15,8 +15,9 @@ type setType =
 | Intersection
 
 
+
 let parseInput = () => {
-  Node.Fs.readFileAsUtf8Sync("../../../../input/Week1/Year2020Day6.sample.txt") 
+  Input.readFile("input/Week1/Year2020Day6.sample.txt")
     ->Js.String2.trim
     ->Js.String2.split("\n\n")
     ->Js.Array2.map((str) => str->Js.String2.split("\n"))

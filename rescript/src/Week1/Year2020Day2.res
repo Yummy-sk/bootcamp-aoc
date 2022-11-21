@@ -9,11 +9,14 @@ type passwordInfo = {
 
 type partType = Part1 | Part2
 
+
 let getInputData = () => 
   Node.Fs.readFileAsUtf8Sync("../../../../input/Week1/Year2020Day2.sample.txt") 
   ->Js.String2.trim
   ->Js.String2.split("\n")
 
+// 원하는 입력값을 위해 파싱하는 함수
+// 1-3 a: abcde -> {upper: 1, lower: 3, letter: "a", password: "abcde"}
 let parseInputData = () => {
   open Belt
 
@@ -30,6 +33,7 @@ let parseInputData = () => {
   })
 }
 
+// part1을 위해 해당 letter가 최소 및 최대 범위에 있는지 확인하는 함수
 let checkLetterCountIsValid = (infos) => {
   open Belt
 
@@ -42,6 +46,7 @@ let checkLetterCountIsValid = (infos) => {
   })
 }
 
+// part2를 위해 각 포지션에 유효한 letter가 있는지 확인하는 함수
 let checkLetterPositionIsValid = (infos) => {
     open Belt
 
@@ -55,7 +60,7 @@ let checkLetterPositionIsValid = (infos) => {
     })
 }
 
-
+// 유요한 비밀번호 갯수를 카운트 합니다.
 let countValidPasswords = (status) => 
   status
   ->Belt.Array.keep(x => x)
@@ -65,16 +70,16 @@ let countValidPasswords = (status) =>
 let solution = (partType) =>
   switch partType {
     | Part1 => {
-        parseInputData()
-        ->checkLetterCountIsValid
-        ->countValidPasswords
-        ->Js.log      
+        parseInputData() // parse input data
+        ->checkLetterCountIsValid // check if letter count is valid
+        ->countValidPasswords // count valid passwords
+        ->Js.log // log result
     }
     | Part2 => {
-        parseInputData()
-        ->checkLetterPositionIsValid
-        ->countValidPasswords
-        ->Js.log
+        parseInputData()  // parse input data
+        ->checkLetterPositionIsValid // check if letter count is valid
+        ->countValidPasswords // count valid passwords
+        ->Js.log // log result
     }
   }
 

@@ -18,7 +18,7 @@ function parseInputData(param) {
                         RE_EXN_ID: "Match_failure",
                         _1: [
                           "Year2020Day2.res",
-                          22,
+                          25,
                           8
                         ],
                         Error: new Error()
@@ -33,7 +33,7 @@ function parseInputData(param) {
                         RE_EXN_ID: "Match_failure",
                         _1: [
                           "Year2020Day2.res",
-                          23,
+                          26,
                           8
                         ],
                         Error: new Error()

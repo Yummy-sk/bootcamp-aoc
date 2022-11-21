@@ -7,7 +7,6 @@ var Belt_Set = require("rescript/lib/js/belt_Set.js");
 var Caml_obj = require("rescript/lib/js/caml_obj.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
-var Belt_SetString = require("rescript/lib/js/belt_SetString.js");
 
 var cmp = Caml_obj.caml_compare;
 
@@ -25,13 +24,7 @@ function parseInput(param) {
               }));
 }
 
-function makeUnique(groups) {
-  return Belt_Array.map(groups, (function (group) {
-                return Belt_SetString.toArray(Belt_SetString.fromArray(group));
-              }));
-}
-
-function getAllAnsweredQuestions(groups) {
+function handleSet(groups, setType) {
   return Belt_Array.map(groups, (function (group) {
                 return Belt_Option.getExn(Belt_Array.reduce(group, Belt_Array.get(group, 0), (function (acc, person) {
                                   if (acc === undefined) {
@@ -39,16 +32,21 @@ function getAllAnsweredQuestions(groups) {
                                   }
                                   var prev = Belt_Set.fromArray(acc, StrCmp);
                                   var curr = Belt_Set.fromArray(person, StrCmp);
-                                  return Belt_Set.toArray(Belt_Set.intersect(prev, curr));
+                                  if (setType) {
+                                    return Belt_Set.toArray(Belt_Set.intersect(prev, curr));
+                                  } else {
+                                    return Belt_Set.toArray(Belt_Set.union(prev, curr));
+                                  }
                                 })));
               }));
 }
 
 function parseData(solType) {
+  var groups = parseInput(undefined);
   if (solType) {
-    return getAllAnsweredQuestions(parseInput(undefined));
+    return handleSet(groups, /* Intersection */1);
   } else {
-    return makeUnique(Belt_Array.map(parseInput(undefined), Belt_Array.concatMany));
+    return handleSet(groups, /* Union */0);
   }
 }
 
@@ -86,8 +84,7 @@ solve(/* Solution2 */1);
 
 exports.StrCmp = StrCmp;
 exports.parseInput = parseInput;
-exports.makeUnique = makeUnique;
-exports.getAllAnsweredQuestions = getAllAnsweredQuestions;
+exports.handleSet = handleSet;
 exports.parseData = parseData;
 exports.countAnswers = countAnswers;
 exports.getSumOfCounts = getSumOfCounts;

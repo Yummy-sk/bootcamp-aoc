@@ -4,9 +4,16 @@ module StrCmp =
     let cmp = Pervasives.compare
   })
 
+
 type solType = 
 | Solution1
 | Solution2
+
+
+type setType = 
+| Union
+| Intersection
+
 
 let parseInput = () => {
   Node.Fs.readFileAsUtf8Sync("../../../../input/Week1/Year2020Day6.sample.txt") 
@@ -16,62 +23,47 @@ let parseInput = () => {
     ->Belt.Array.map((arr) => arr->Belt.Array.map((str)=>str->Js.String2.split("")))
 }
 
-
-let makeUnique = (groups) => {
+// 각 파트에 맞는 값을 도출하는 코드입니다.
+let handleSet = (groups, setType) => {
   open Belt
-  groups
-    ->Array.map((group) => 
-      group
-        ->Set.String.fromArray
-        ->Set.String.toArray
-    )
-}
 
-
-let getAllAnsweredQuestions = (groups) => {
-  open Belt
   groups
   ->Array.map((group) => {
-      group
-      ->Array.reduce(group->Array.get(0), (acc, person) => {
-        switch(acc) {
-          | Some(acc) => {
-            let prev = Set.fromArray(acc, ~id=module(StrCmp))
-            let curr = Set.fromArray(person, ~id=module(StrCmp))
+    group
+    ->Array.reduce(group->Array.get(0), (acc, person) => {
+      switch acc {
+        | Some(acc) => {
+          let prev = Set.fromArray(acc, ~id=module(StrCmp))
+          let curr = Set.fromArray(person, ~id=module(StrCmp))
 
-            Set.intersect(prev, curr)
-            ->Set.toArray
-            ->Some
+          switch setType {
+            | Union => Some(Set.toArray(Set.union(prev, curr))) // 합집합 for part1
+            | Intersection => Some(Set.toArray(Set.intersect(prev, curr))) // 교집합 for part2
           }
-          | None => None
         }
-      })
-  }
-  ->Option.getExn)
+        | None => None
+      }
+    })
+  }->Option.getExn)
 }
 
-
+// 각 파트에 맞는 값을 파싱하는 코드입니다. (parse)
 let parseData = (solType) => {
-  open Belt
-  switch (solType) {
-    | Solution1 => 
-      parseInput()
-        ->Array.map(Array.concatMany)
-        ->makeUnique
-    | Solution2 => {
-      parseInput()
-        ->getAllAnsweredQuestions
-    }
+  let groups = parseInput()
+  switch solType {
+    | Solution1 => groups->handleSet(Union)
+    | Solution2 => groups->handleSet(Intersection)
   }
 }
 
-
+// 파싱된 데이터에 문제를 위한 값을 반환하는 함수입니다. (process)
 let countAnswers = (groups) => {
+  open Belt
   groups
-    ->Belt.Array.map((group) => group->Belt.Array.length)
+    ->Array.map((group) => group->Array.length)
 }
 
-
+// 전달 받은 값의 합계를 집계하는 함수입니다. (aggregate)
 let getSumOfCounts = (counts) => 
   counts
     ->Belt.Array.reduce(0, (acc, count) => acc + count)

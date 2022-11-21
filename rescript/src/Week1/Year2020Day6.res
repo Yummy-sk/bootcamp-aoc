@@ -38,8 +38,8 @@ let handleSet = (groups, setType) => {
           let curr = Set.fromArray(person, ~id=module(StrCmp))
 
           switch setType {
-            | Union => Some(Set.toArray(Set.union(prev, curr))) // 합집합 for part1
-            | Intersection => Some(Set.toArray(Set.intersect(prev, curr))) // 교집합 for part2
+            | Union => Set.union(prev, curr)->Set.toArray->Some // 합집합 for part1
+            | Intersection => Set.intersect(prev, curr)->Set.toArray->Some // 교집합 for part2
           }
         }
         | None => None

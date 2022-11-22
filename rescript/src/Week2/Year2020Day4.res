@@ -1,29 +1,105 @@
-// --- Day 4: Passport Processing ---
-// part1
 
-/*
-1. passport 타입을 생각해봅시다. *문제와 동일하게* record로 선언하세요.
-*/
-type passport
+type ecl = 
+  Amb(string) | 
+  Blu(string) | 
+  Grn(string) | 
+  Gry(string) | 
+  Hzl(string) | 
+  Oth(string) | 
+  Brn(string) | 
+  Unknown(string) | 
+  None
+type hcl = Hcl(string) | None
+type pid = Pid(string) | None
 
-/*
-2. string 타입의 입력을 passport 타입으로 파싱하는 parsePassport 함수를 작성해보세요.
-   (우선 parsePassport 타입의 타입 시그니처를 생각해보세요)
-*/
-let parsePassport = () => ()
 
-/*
-3. 올바른 Passport를 세는 countPassport 함수를 만들어서 문제를 해결해봅시다.
-*/
-let countPassport: array<passport> => int = _ => 0
+type passport = {
+  byr: int,
+  iyr: int,
+  eyr: int,
+  hgt: int,
+  hcl: hcl,
+  ecl: ecl,
+  pid: pid,
+  cid?: int, 
+}
 
-// part2
-/*
-4. part1과 동일하게, *문제를 그대로* 코드로 옮겨보세요.
-*/
+let formatPassportInfo = (line) => {
+  let initialPassport = {
+    byr: 0,
+    iyr: 0,
+    eyr: 0,
+    hgt: 0,
+    hcl: None,
+    ecl: None,
+    pid: None,
+  }
 
-/*
-참고 링크
-- https://rescript-lang.org/docs/manual/latest/record
-- https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/
-*/
+  line
+  ->Js.String2.split(" ")
+  ->Belt.Array.reduce(initialPassport, (acc, info) => {
+
+    switch (info->Js.String2.split(":")) {
+    | [key, value] => {
+      switch (key) {
+      | "byr" => {...acc, byr: value->Belt.Int.fromString->Belt.Option.getExn}
+      | "iyr" => {...acc, iyr: value->Belt.Int.fromString->Belt.Option.getExn}
+      | "eyr" => {...acc, eyr: value->Belt.Int.fromString->Belt.Option.getExn}
+      | "hgt" => {...acc, hgt: value->Belt.Int.fromString->Belt.Option.getExn}
+      | "hcl" => {...acc, hcl: Hcl(value)}
+      | "ecl" => {...acc, ecl: switch (value) {
+        | "amb" => Amb(value)
+        | "blu" => Blu(value)
+        | "brn" => Brn(value)
+        | "gry" => Gry(value)
+        | "grn" => Grn(value)
+        | "hzl" => Hzl(value)
+        | "oth" => Oth(value)
+        | _ => Unknown(value)
+        }}
+      | "pid" => {...acc, pid: Pid(value)}
+      | "cid" => {...acc, cid: value->Belt.Int.fromString->Belt.Option.getExn}
+      | _ => acc
+      }
+    }
+    | _ => acc}
+})
+}
+
+
+let parsePassport = () => {
+  Input.readFile("input/Week2/Year2020Day4.sample.txt")
+  ->Js.String2.split("\n\n")
+  ->Belt.Array.map(line=>
+    line
+    ->Js.String2.replaceByRe(%re("/\n/g"), " ")
+    ->Js.String2.trim
+  )
+  ->Belt.Array.map(formatPassportInfo)
+}
+
+let checkAllFieldsAreExist = (passport) => {
+  let {byr, iyr, eyr, hgt, hcl, ecl, pid} = passport
+
+  byr > 0 && 
+  iyr > 0 && 
+  eyr > 0 && 
+  hgt > 0 && 
+  hcl != None && 
+  ecl != None && 
+  pid != None
+}
+
+
+
+let countPassport = (passports) => {
+  passports
+  ->Belt.Array.keep(passport => passport->checkAllFieldsAreExist)
+  ->Belt.Array.length
+}
+
+
+
+parsePassport()
+->countPassport
+->Js.log

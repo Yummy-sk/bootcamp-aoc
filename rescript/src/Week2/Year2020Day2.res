@@ -6,26 +6,6 @@ type passwordInfo = {
   password: string
 }
 
-// Functor
-// Monad
-
-// map: option a => (a => 'b) => option 'b
-// flatMap: option a => (a => option 'b) => option 'b
-
-// flatMap = map(a, a => b) : option a => (a => option b) => option option b
-// monoad is just monoid of category of endofuctor
-
-// let x = Some(1)->Belt.Option.map(a => Some(a)) // option option int
-// let y = Some(1)->Belt.Option.flatMap(a => Some(a)) // option int
-
-// Promise(a => a => Promise(b)) : P(b)
-
-// P { let a = await P(b) } <- here
-
-// P(a).then(a => Promise(b))
-//           ^^^^^^^^^^^^^^^ here
-
-// functeor -> Monad
 type partType = Part1 | Part2
 
 
@@ -92,31 +72,6 @@ let checkLetterPositionIsValid = (infos) => {
       letterAtLower != letterAtUpper
     })
 }
-
-// JS
-// `==` type coercion
-// `===`
-
-// ReScript
-// `==` 구조적 비교
-// `===` JS 와 동일
-
-// OCaml
-// `=` 구조적 비교
-// `==` 참조 비교
-
-// obj != obj deep equal
-// obj !== obj referance
-
-type x = {a: int, b: string}
-let a = {a: 1, b: "b"}
-let b = {a: 1, b: "b"}
-
-let c = a == b
-let d = a === b
-
-c->Js.log
-d->Js.log
 
 // 유요한 비밀번호 갯수를 카운트 합니다.
 let countValidPasswords = (status) => 

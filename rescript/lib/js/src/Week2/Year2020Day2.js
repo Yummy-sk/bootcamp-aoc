@@ -3,7 +3,6 @@
 
 var Input = require("../Input.js");
 var Belt_Int = require("rescript/lib/js/belt_Int.js");
-var Caml_obj = require("rescript/lib/js/caml_obj.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Pervasives = require("rescript/lib/js/pervasives.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
@@ -62,24 +61,6 @@ function checkLetterPositionIsValid(infos) {
               }));
 }
 
-var a = {
-  a: 1,
-  b: "b"
-};
-
-var b = {
-  a: 1,
-  b: "b"
-};
-
-var c = Caml_obj.equal(a, b);
-
-var d = a === b;
-
-console.log(c);
-
-console.log(d);
-
 function countValidPasswords(status) {
   return status.length;
 }
@@ -101,10 +82,6 @@ exports.formatData = formatData;
 exports.parseInputData = parseInputData;
 exports.checkLetterCountIsValid = checkLetterCountIsValid;
 exports.checkLetterPositionIsValid = checkLetterPositionIsValid;
-exports.a = a;
-exports.b = b;
-exports.c = c;
-exports.d = d;
 exports.countValidPasswords = countValidPasswords;
 exports.solution = solution;
-/* c Not a pure module */
+/*  Not a pure module */

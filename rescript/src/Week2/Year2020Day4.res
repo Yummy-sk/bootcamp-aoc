@@ -69,6 +69,7 @@ let formatPassportInfoToRecord = (line) => {
       | "eyr" => {...acc, eyr: value->covertTypeToInt}
       | "hcl" => {...acc, hcl: Hcl(value)}
       | "hgt" => {
+          // 단위와 height를 split합니다.
           let unit = value->Js.String2.sliceToEnd(~from=-2)
           let height = value->Js.String2.slice(~from=0, ~to_=-2)
 
@@ -147,7 +148,7 @@ let getPassportWhichValueAreAllValid = (passports) =>
     | _ => false
     } &&
     switch (hcl) {
-    | Hcl(value) => Js.Re.test_(%re("/^#[0-9a-f]{6}$/"), value)
+    | Hcl(value) => Js.Re.test_(%re("/^#[0-9a-f]{6}$/"), value) // 정규식에 맞는 상태값을 반영합니다.
     | _ => false
     } &&
     switch (ecl) {
@@ -161,7 +162,7 @@ let getPassportWhichValueAreAllValid = (passports) =>
     | _ => false
     } &&
     switch (pid) {
-    | Pid(value) => Js.Re.test_(%re("/^[0-9]{9}$/"), value)
+    | Pid(value) => Js.Re.test_(%re("/^[0-9]{9}$/"), value) // 정규식에 맞는 상태값을 반영합니다.
     | _ => false
     }
   })

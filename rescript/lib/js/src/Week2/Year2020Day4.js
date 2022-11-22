@@ -11,7 +11,7 @@ function covertTypeToInt(value) {
   return Belt_Option.getExn(Belt_Int.fromString(value));
 }
 
-function formatPassportInfo(line) {
+function formatPassportInfoToRecord(line) {
   return Belt_Array.reduce(line.split(" "), {
               byr: 0,
               iyr: 0,
@@ -118,7 +118,7 @@ function formatPassportInfo(line) {
 function parsePassport(param) {
   return Belt_Array.map(Belt_Array.map(Input.readFile("input/Week2/Year2020Day4.sample.txt").split("\n\n"), (function (line) {
                     return line.replace(/\n/g, " ").trim();
-                  })), formatPassportInfo);
+                  })), formatPassportInfoToRecord);
 }
 
 function getPassportWhichFieldAreAllExist(passports) {
@@ -139,7 +139,7 @@ function rangeValidator(min, max, value) {
   }
 }
 
-function checkPassportFieldsAreValid(passports) {
+function getPassportWhichValueAreAllValid(passports) {
   return Belt_Array.keep(passports, (function (passport) {
                 var pid = passport.pid;
                 var hgt = passport.hgt;
@@ -170,7 +170,7 @@ function checkPassportFieldsAreValid(passports) {
 
 function countPassport(passports, part) {
   if (part) {
-    return checkPassportFieldsAreValid(passports).length;
+    return getPassportWhichValueAreAllValid(passports).length;
   } else {
     return getPassportWhichFieldAreAllExist(passports).length;
   }
@@ -179,7 +179,7 @@ function countPassport(passports, part) {
 function solution(part) {
   if (part) {
     var passports = parsePassport(undefined);
-    console.log(checkPassportFieldsAreValid(passports).length);
+    console.log(getPassportWhichValueAreAllValid(passports).length);
     return ;
   }
   var passports$1 = parsePassport(undefined);
@@ -191,11 +191,11 @@ solution(/* Part1 */0);
 solution(/* Part2 */1);
 
 exports.covertTypeToInt = covertTypeToInt;
-exports.formatPassportInfo = formatPassportInfo;
+exports.formatPassportInfoToRecord = formatPassportInfoToRecord;
 exports.parsePassport = parsePassport;
 exports.getPassportWhichFieldAreAllExist = getPassportWhichFieldAreAllExist;
 exports.rangeValidator = rangeValidator;
-exports.checkPassportFieldsAreValid = checkPassportFieldsAreValid;
+exports.getPassportWhichValueAreAllValid = getPassportWhichValueAreAllValid;
 exports.countPassport = countPassport;
 exports.solution = solution;
 /*  Not a pure module */

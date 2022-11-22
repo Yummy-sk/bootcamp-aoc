@@ -29,11 +29,13 @@ type passport = {
 }
 
 
+// 타입을 Int로 변환하는 함수입니다. (for 중복제거)
 let covertTypeToInt = (value) =>
   value->Belt.Int.fromString->Belt.Option.getExn
  
 
-let formatPassportInfo = (line) => {
+// Passport 정보를 레코드로 변환하는 함수입니다.
+let formatPassportInfoToRecord = (line) => {
   let initialPassport = {
     byr: 0,
     iyr: 0,
@@ -85,7 +87,8 @@ let formatPassportInfo = (line) => {
 }
 
 
-let parsePassport = () => {
+// 입력값을 파싱하는 함수입니다.
+let parsePassport = () => 
   Input.readFile("input/Week2/Year2020Day4.sample.txt")
   ->Js.String2.split("\n\n")
   ->Belt.Array.map(line=>
@@ -93,11 +96,11 @@ let parsePassport = () => {
     ->Js.String2.replaceByRe(%re("/\n/g"), " ")
     ->Js.String2.trim
   )
-  ->Belt.Array.map(formatPassportInfo)
-}
+  ->Belt.Array.map(formatPassportInfoToRecord)
 
 
-let getPassportWhichFieldAreAllExist = (passports) => {
+// Part1을 위해 모든 필수 필드가 존재하는지 확인하는 함수입니다.
+let getPassportWhichFieldAreAllExist = (passports) => 
 
   passports
   ->Belt.Array.keep(passport => {
@@ -111,14 +114,15 @@ let getPassportWhichFieldAreAllExist = (passports) => {
     ecl != None && 
     pid != None
   })
-}
 
 
+// 유효성을 위해 범위를 체크하는 함수입니다.
 let rangeValidator = (min, max, value) =>
   value >= min && value <= max
 
 
-let checkPassportFieldsAreValid = (passports) => {
+// Passport 정보가 모두 유효한지 확인하는 함수입니다.
+let getPassportWhichValueAreAllValid = (passports) => 
   passports
   ->Belt.Array.keep(passport => {
     let {byr, iyr, eyr, hgt, hcl, ecl, pid} = passport
@@ -150,15 +154,14 @@ let checkPassportFieldsAreValid = (passports) => {
     | _ => false
     }
   })
-}
 
 
-let countPassport = (passports, part) => {
+// 유효한 Passport 갯수를 카운트하는 함수입니다.
+let countPassport = (passports, part) => 
   switch (part) {
     | Part1 => passports->getPassportWhichFieldAreAllExist->Belt.Array.length
-    | Part2 => passports->checkPassportFieldsAreValid->Belt.Array.length
+    | Part2 => passports->getPassportWhichValueAreAllValid->Belt.Array.length
   }
-}
 
 
 let solution = (part) => 

@@ -71,7 +71,6 @@ function solution(partType) {
   } else {
     console.log(checkLetterCountIsValid(parseInputData(undefined)).length);
   }
-  
 }
 
 solution(/* Part1 */0);

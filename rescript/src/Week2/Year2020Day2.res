@@ -6,7 +6,26 @@ type passwordInfo = {
   password: string
 }
 
+// Functor
+// Monad
 
+// map: option a => (a => 'b) => option 'b
+// flatMap: option a => (a => option 'b) => option 'b
+
+// flatMap = map(a, a => b) : option a => (a => option b) => option option b
+// monoad is just monoid of category of endofuctor
+
+// let x = Some(1)->Belt.Option.map(a => Some(a)) // option option int
+// let y = Some(1)->Belt.Option.flatMap(a => Some(a)) // option int
+
+// Promise(a => a => Promise(b)) : P(b)
+
+// P { let a = await P(b) } <- here
+
+// P(a).then(a => Promise(b))
+//           ^^^^^^^^^^^^^^^ here
+
+// functeor -> Monad
 type partType = Part1 | Part2
 
 

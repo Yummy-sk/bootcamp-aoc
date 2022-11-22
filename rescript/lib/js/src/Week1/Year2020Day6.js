@@ -8,7 +8,7 @@ var Caml_obj = require("rescript/lib/js/caml_obj.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 
-var cmp = Caml_obj.caml_compare;
+var cmp = Caml_obj.compare;
 
 var StrCmp = Belt_Id.MakeComparable({
       cmp: cmp
@@ -67,7 +67,6 @@ function solve(solType) {
   console.log(getSumOfCounts(Belt_Array.map(groups, (function (group) {
                   return group.length;
                 }))));
-  
 }
 
 function solution(solType) {

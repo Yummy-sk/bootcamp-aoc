@@ -117,7 +117,7 @@ let getPassportWhichFieldAreAllExist = (passports) =>
 
 
 // 유효성을 위해 범위를 체크하는 함수입니다.
-let rangeValidator = (min, max, value) =>
+let rangeValidator = (~min, ~max, ~value) =>
   value >= min && value <= max
 
 
@@ -127,12 +127,12 @@ let getPassportWhichValueAreAllValid = (passports) =>
   ->Belt.Array.keep(passport => {
     let {byr, iyr, eyr, hgt, hcl, ecl, pid} = passport
 
-    rangeValidator(1920, 2002, byr) &&
-    rangeValidator(2010, 2020, iyr) &&
-    rangeValidator(2020, 2030, eyr) &&
+    rangeValidator(~min=1920, ~max=2002, ~value=byr) &&
+    rangeValidator(~min=2010, ~max=2020, ~value=iyr) &&
+    rangeValidator(~min=2020, ~max=2030, ~value=eyr) &&
     switch (hgt) {
-    | Cm(height) => height >= 150 && height <= 193
-    | In(height) => height >= 59 && height <= 76
+    | Cm(height) => rangeValidator(~min=150, ~max=193, ~value=height)
+    | In(height) => rangeValidator(~min=59, ~max=76, ~value=height)
     | _ => false
     } &&
     switch (hcl) {
@@ -157,18 +157,26 @@ let getPassportWhichValueAreAllValid = (passports) =>
 
 
 // 유효한 Passport 갯수를 카운트하는 함수입니다.
-let countPassport = (passports, part) => 
+let countPassport = (passports) => 
+  passports
+  ->Belt.Array.length
+
+
+let solution = (part) => {
+  let passports = parsePassport() // 입력값을 파싱합니다.
+
   switch (part) {
-    | Part1 => passports->getPassportWhichFieldAreAllExist->Belt.Array.length
-    | Part2 => passports->getPassportWhichValueAreAllValid->Belt.Array.length
+  | Part1 => {
+    passports
+    ->getPassportWhichFieldAreAllExist // 필수 필드가 모두 존재하는지 확인합니다.
   }
-
-
-let solution = (part) => 
-  switch(part) {
-    | Part1 => parsePassport()->countPassport(Part1)->Js.log
-    | Part2 => parsePassport()->countPassport(Part2)->Js.log
-  }
+  | Part2 => {
+    passports
+    ->getPassportWhichValueAreAllValid // Passport 정보가 모두 유효한지 확인합니다.
+  }}
+  ->countPassport // 유효한 Passport 갯수를 카운트합니다.
+  ->Js.log // 결과를 출력합니다.
+}
 
 
 Part1->solution

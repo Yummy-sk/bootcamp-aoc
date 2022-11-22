@@ -147,15 +147,9 @@ function getPassportWhichValueAreAllValid(passports) {
                 var tmp = false;
                 if (rangeValidator(1920, 2002, passport.byr) && rangeValidator(2010, 2020, passport.iyr) && rangeValidator(2020, 2030, passport.eyr)) {
                   var tmp$1;
-                  if (typeof hgt === "number") {
-                    tmp$1 = false;
-                  } else if (hgt.TAG === /* Cm */0) {
-                    var height = hgt._0;
-                    tmp$1 = height >= 150 && height <= 193;
-                  } else {
-                    var height$1 = hgt._0;
-                    tmp$1 = height$1 >= 59 && height$1 <= 76;
-                  }
+                  tmp$1 = typeof hgt === "number" ? false : (
+                      hgt.TAG === /* Cm */0 ? rangeValidator(150, 193, hgt._0) : rangeValidator(59, 76, hgt._0)
+                    );
                   tmp = tmp$1;
                 }
                 if (tmp && (
@@ -168,22 +162,15 @@ function getPassportWhichValueAreAllValid(passports) {
               }));
 }
 
-function countPassport(passports, part) {
-  if (part) {
-    return getPassportWhichValueAreAllValid(passports).length;
-  } else {
-    return getPassportWhichFieldAreAllExist(passports).length;
-  }
+function countPassport(passports) {
+  return passports.length;
 }
 
 function solution(part) {
-  if (part) {
-    var passports = parsePassport(undefined);
-    console.log(getPassportWhichValueAreAllValid(passports).length);
-    return ;
-  }
-  var passports$1 = parsePassport(undefined);
-  console.log(getPassportWhichFieldAreAllExist(passports$1).length);
+  var passports = parsePassport(undefined);
+  console.log((
+        part ? getPassportWhichValueAreAllValid(passports) : getPassportWhichFieldAreAllExist(passports)
+      ).length);
 }
 
 solution(/* Part1 */0);

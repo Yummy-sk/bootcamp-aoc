@@ -72,7 +72,8 @@ let formatPassportInfoToRecord = (line) => {
           // 단위와 height를 split합니다.
           let unit = value->Js.String2.sliceToEnd(~from=-2)
           let height = value->Js.String2.slice(~from=0, ~to_=-2)
-
+          
+          // 이후 값을 반영하는데, 유효하지 않다면 Unknown 타입으로 반영합니다. for part1
           switch (unit) {
           | "cm" => {...acc, hgt: Cm(height->covertTypeToInt)}
           | "in" => {...acc, hgt: In(height->covertTypeToInt)}
@@ -87,7 +88,7 @@ let formatPassportInfoToRecord = (line) => {
         | "grn" => Grn
         | "hzl" => Hzl
         | "oth" => Oth
-        | _ => Unknown
+        | _ => Unknown // 값이 유효하지 않다면 Unknown 타입으로 반영합니다. for part1
         }}
       | "pid" => {...acc, pid: Pid(value)}
       | "cid" => {...acc, cid: value->covertTypeToInt}

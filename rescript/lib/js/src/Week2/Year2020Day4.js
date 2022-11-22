@@ -7,14 +7,18 @@ var Caml_obj = require("rescript/lib/js/caml_obj.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 
+function covertTypeToInt(value) {
+  return Belt_Option.getExn(Belt_Int.fromString(value));
+}
+
 function formatPassportInfo(line) {
   return Belt_Array.reduce(line.split(" "), {
               byr: 0,
               iyr: 0,
               eyr: 0,
-              hgt: 0,
               hcl: /* None */0,
-              ecl: /* None */0,
+              hgt: /* None */1,
+              ecl: /* None */8,
               pid: /* None */0
             }, (function (acc, info) {
                 var match = info.split(":");
@@ -37,52 +41,28 @@ function formatPassportInfo(line) {
                       var tmp;
                       switch (value) {
                         case "amb" :
-                            tmp = {
-                              TAG: /* Amb */0,
-                              _0: value
-                            };
+                            tmp = /* Amb */0;
                             break;
                         case "blu" :
-                            tmp = {
-                              TAG: /* Blu */1,
-                              _0: value
-                            };
+                            tmp = /* Blu */1;
                             break;
                         case "brn" :
-                            tmp = {
-                              TAG: /* Brn */6,
-                              _0: value
-                            };
+                            tmp = /* Brn */6;
                             break;
                         case "grn" :
-                            tmp = {
-                              TAG: /* Grn */2,
-                              _0: value
-                            };
+                            tmp = /* Grn */2;
                             break;
                         case "gry" :
-                            tmp = {
-                              TAG: /* Gry */3,
-                              _0: value
-                            };
+                            tmp = /* Gry */3;
                             break;
                         case "hzl" :
-                            tmp = {
-                              TAG: /* Hzl */4,
-                              _0: value
-                            };
+                            tmp = /* Hzl */4;
                             break;
                         case "oth" :
-                            tmp = {
-                              TAG: /* Oth */5,
-                              _0: value
-                            };
+                            tmp = /* Oth */5;
                             break;
                         default:
-                          tmp = {
-                            TAG: /* Unknown */7,
-                            _0: value
-                          };
+                          tmp = /* Unknown */7;
                       }
                       newrecord$2.ecl = tmp;
                       return newrecord$2;
@@ -97,19 +77,38 @@ function formatPassportInfo(line) {
                       };
                       return newrecord$4;
                   case "hgt" :
-                      var newrecord$5 = Caml_obj.obj_dup(acc);
-                      newrecord$5.hgt = Belt_Option.getExn(Belt_Int.fromString(value));
-                      return newrecord$5;
+                      var unit = value.slice(-2);
+                      var height = value.slice(0, -2);
+                      switch (unit) {
+                        case "cm" :
+                            var newrecord$5 = Caml_obj.obj_dup(acc);
+                            newrecord$5.hgt = {
+                              TAG: /* Cm */0,
+                              _0: Belt_Option.getExn(Belt_Int.fromString(height))
+                            };
+                            return newrecord$5;
+                        case "in" :
+                            var newrecord$6 = Caml_obj.obj_dup(acc);
+                            newrecord$6.hgt = {
+                              TAG: /* In */1,
+                              _0: Belt_Option.getExn(Belt_Int.fromString(height))
+                            };
+                            return newrecord$6;
+                        default:
+                          var newrecord$7 = Caml_obj.obj_dup(acc);
+                          newrecord$7.hgt = /* Unknown */0;
+                          return newrecord$7;
+                      }
                   case "iyr" :
-                      var newrecord$6 = Caml_obj.obj_dup(acc);
-                      newrecord$6.iyr = Belt_Option.getExn(Belt_Int.fromString(value));
-                      return newrecord$6;
+                      var newrecord$8 = Caml_obj.obj_dup(acc);
+                      newrecord$8.iyr = Belt_Option.getExn(Belt_Int.fromString(value));
+                      return newrecord$8;
                   case "pid" :
-                      var newrecord$7 = Caml_obj.obj_dup(acc);
-                      newrecord$7.pid = /* Pid */{
+                      var newrecord$9 = Caml_obj.obj_dup(acc);
+                      newrecord$9.pid = /* Pid */{
                         _0: value
                       };
-                      return newrecord$7;
+                      return newrecord$9;
                   default:
                     return acc;
                 }
@@ -122,22 +121,81 @@ function parsePassport(param) {
                   })), formatPassportInfo);
 }
 
-function checkAllFieldsAreExist(passport) {
-  if (passport.byr > 0 && passport.iyr > 0 && passport.eyr > 0 && passport.hgt > 0 && passport.hcl !== /* None */0 && passport.ecl !== /* None */0) {
-    return passport.pid !== /* None */0;
+function getPassportWhichFieldAreAllExist(passports) {
+  return Belt_Array.keep(passports, (function (passport) {
+                if (passport.byr > 0 && passport.iyr > 0 && passport.eyr > 0 && passport.hgt !== /* None */1 && passport.hcl !== /* None */0 && passport.ecl !== /* None */8) {
+                  return passport.pid !== /* None */0;
+                } else {
+                  return false;
+                }
+              }));
+}
+
+function rangeValidator(min, max, value) {
+  if (Caml_obj.greaterequal(value, min)) {
+    return Caml_obj.lessequal(value, max);
   } else {
     return false;
   }
 }
 
-function countPassport(passports) {
-  return Belt_Array.keep(passports, checkAllFieldsAreExist).length;
+function checkPassportFieldsAreValid(passports) {
+  return Belt_Array.keep(passports, (function (passport) {
+                var pid = passport.pid;
+                var hgt = passport.hgt;
+                var hcl = passport.hcl;
+                var tmp = false;
+                if (rangeValidator(1920, 2002, passport.byr) && rangeValidator(2010, 2020, passport.iyr) && rangeValidator(2020, 2030, passport.eyr)) {
+                  var tmp$1;
+                  if (typeof hgt === "number") {
+                    tmp$1 = false;
+                  } else if (hgt.TAG === /* Cm */0) {
+                    var height = hgt._0;
+                    tmp$1 = height >= 150 && height <= 193;
+                  } else {
+                    var height$1 = hgt._0;
+                    tmp$1 = height$1 >= 59 && height$1 <= 76;
+                  }
+                  tmp = tmp$1;
+                }
+                if (tmp && (
+                    hcl ? /^#[0-9a-f]{6}$/.test(hcl._0) : false
+                  ) && passport.ecl < 7 && pid) {
+                  return /^[0-9]{9}$/.test(pid._0);
+                } else {
+                  return false;
+                }
+              }));
 }
 
-console.log(countPassport(parsePassport(undefined)));
+function countPassport(passports, part) {
+  if (part) {
+    return checkPassportFieldsAreValid(passports).length;
+  } else {
+    return getPassportWhichFieldAreAllExist(passports).length;
+  }
+}
 
+function solution(part) {
+  if (part) {
+    var passports = parsePassport(undefined);
+    console.log(checkPassportFieldsAreValid(passports).length);
+    return ;
+  }
+  var passports$1 = parsePassport(undefined);
+  console.log(getPassportWhichFieldAreAllExist(passports$1).length);
+}
+
+solution(/* Part1 */0);
+
+solution(/* Part2 */1);
+
+exports.covertTypeToInt = covertTypeToInt;
 exports.formatPassportInfo = formatPassportInfo;
 exports.parsePassport = parsePassport;
-exports.checkAllFieldsAreExist = checkAllFieldsAreExist;
+exports.getPassportWhichFieldAreAllExist = getPassportWhichFieldAreAllExist;
+exports.rangeValidator = rangeValidator;
+exports.checkPassportFieldsAreValid = checkPassportFieldsAreValid;
 exports.countPassport = countPassport;
+exports.solution = solution;
 /*  Not a pure module */

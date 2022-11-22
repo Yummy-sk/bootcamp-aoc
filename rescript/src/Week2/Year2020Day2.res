@@ -72,7 +72,7 @@ let checkLetterCountIsValid = (infos) => {
   infos
   ->Array.keep(info => {
     let {upper, lower, letter, password} = info
-    let letterCount = password->Js.String2.split("")->Array.keep(x => x == letter)->Array.length
+    let letterCount = password->Js.String2.split("")->Array.keep(x => x === letter)->Array.length
 
     letterCount >= lower && letterCount <= upper
   })
@@ -92,6 +92,31 @@ let checkLetterPositionIsValid = (infos) => {
       letterAtLower != letterAtUpper
     })
 }
+
+// JS
+// `==` type coercion
+// `===`
+
+// ReScript
+// `==` 구조적 비교
+// `===` JS 와 동일
+
+// OCaml
+// `=` 구조적 비교
+// `==` 참조 비교
+
+// obj != obj deep equal
+// obj !== obj referance
+
+type x = {a: int, b: string}
+let a = {a: 1, b: "b"}
+let b = {a: 1, b: "b"}
+
+let c = a == b
+let d = a === b
+
+c->Js.log
+d->Js.log
 
 // 유요한 비밀번호 갯수를 카운트 합니다.
 let countValidPasswords = (status) => 

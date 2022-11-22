@@ -17,6 +17,17 @@ type pid = Pid(string) | None
 
 type hgt = Cm(int) | In(int) | Unknown | None
 
+/**
+* byr:1937 -> (Birth Year)
+* iyr:2017 -> (Issue Year)
+* eyr:2020 -> (Expiration Year)
+* hgt:183cm -> (Height)
+* hcl:#fffffd -> (Hair Color)
+* ecl:gry -> (Eye Color)
+* pid:860033327 -> (Passport ID)
+* cid:147 -> (Country ID)
+*/
+
 type passport = {
   byr: int,
   iyr: int,

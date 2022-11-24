@@ -2,12 +2,13 @@
 'use strict';
 
 var Fs = require("fs");
+var Js_string = require("rescript/lib/js/js_string.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Caml_option = require("rescript/lib/js/caml_option.js");
 var Caml_splice_call = require("rescript/lib/js/caml_splice_call.js");
 
 function getInputData(param) {
-  return Fs.readFileSync("../../../../input/Week1/Year2020Day5.sample.txt", "utf8").trim().split("\n");
+  return Js_string.split("\n", Fs.readFileSync("../../../../input/Week1/Year2020Day5.sample.txt", "utf8").trim());
 }
 
 function getBinaryNumber(input) {
@@ -30,7 +31,7 @@ function getBinaryNumber(input) {
 }
 
 function getDecimalNumber(binary) {
-  return Number("0b" + binary) | 0;
+  return Number("0b" + binary + "") | 0;
 }
 
 function calculateSeatId(inputs) {
@@ -61,12 +62,10 @@ function getMissingSeatId(inputs) {
 
 function solutionPart1(param) {
   console.log(Caml_splice_call.spliceApply(Math.max, [calculateSeatId(getInputData(undefined))]));
-  
 }
 
 function solutionPart2(param) {
   console.log(getMissingSeatId(calculateSeatId(getInputData(undefined))));
-  
 }
 
 solutionPart1(undefined);

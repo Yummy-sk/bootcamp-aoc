@@ -15,5 +15,10 @@ function readFile(path) {
   return Fs.readFileSync(fullPath, "utf8").trim();
 }
 
+function splitLine(str, delim) {
+  return str.split(delim);
+}
+
 exports.readFile = readFile;
+exports.splitLine = splitLine;
 /* fs Not a pure module */

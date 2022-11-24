@@ -3,186 +3,580 @@
 
 var Input = require("../Input.js");
 var Belt_Int = require("rescript/lib/js/belt_Int.js");
-var Caml_obj = require("rescript/lib/js/caml_obj.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
+var Belt_Result = require("rescript/lib/js/belt_Result.js");
 
 function covertTypeToInt(value) {
   return Belt_Option.getExn(Belt_Int.fromString(value));
 }
 
-function formatPassportInfoToRecord(line) {
-  return Belt_Array.reduce(line.split(" "), {
-              byr: 0,
-              iyr: 0,
-              eyr: 0,
-              hcl: /* None */0,
-              hgt: /* None */1,
-              ecl: /* None */8,
-              pid: /* None */0
-            }, (function (acc, info) {
-                var match = info.split(":");
-                if (match.length !== 2) {
-                  return acc;
-                }
-                var key = match[0];
-                var value = match[1];
-                switch (key) {
-                  case "byr" :
-                      var newrecord = Caml_obj.obj_dup(acc);
-                      newrecord.byr = Belt_Option.getExn(Belt_Int.fromString(value));
-                      return newrecord;
-                  case "cid" :
-                      var newrecord$1 = Caml_obj.obj_dup(acc);
-                      newrecord$1.cid = Belt_Option.getExn(Belt_Int.fromString(value));
-                      return newrecord$1;
-                  case "ecl" :
-                      var newrecord$2 = Caml_obj.obj_dup(acc);
-                      var tmp;
-                      switch (value) {
-                        case "amb" :
-                            tmp = /* Amb */0;
-                            break;
-                        case "blu" :
-                            tmp = /* Blu */1;
-                            break;
-                        case "brn" :
-                            tmp = /* Brn */6;
-                            break;
-                        case "grn" :
-                            tmp = /* Grn */2;
-                            break;
-                        case "gry" :
-                            tmp = /* Gry */3;
-                            break;
-                        case "hzl" :
-                            tmp = /* Hzl */4;
-                            break;
-                        case "oth" :
-                            tmp = /* Oth */5;
-                            break;
-                        default:
-                          tmp = /* Unknown */7;
-                      }
-                      newrecord$2.ecl = tmp;
-                      return newrecord$2;
-                  case "eyr" :
-                      var newrecord$3 = Caml_obj.obj_dup(acc);
-                      newrecord$3.eyr = Belt_Option.getExn(Belt_Int.fromString(value));
-                      return newrecord$3;
-                  case "hcl" :
-                      var newrecord$4 = Caml_obj.obj_dup(acc);
-                      newrecord$4.hcl = /* Hcl */{
-                        _0: value
-                      };
-                      return newrecord$4;
-                  case "hgt" :
-                      var unit = value.slice(-2);
-                      var height = value.slice(0, -2);
-                      switch (unit) {
-                        case "cm" :
-                            var newrecord$5 = Caml_obj.obj_dup(acc);
-                            newrecord$5.hgt = {
-                              TAG: /* Cm */0,
-                              _0: Belt_Option.getExn(Belt_Int.fromString(height))
-                            };
-                            return newrecord$5;
-                        case "in" :
-                            var newrecord$6 = Caml_obj.obj_dup(acc);
-                            newrecord$6.hgt = {
-                              TAG: /* In */1,
-                              _0: Belt_Option.getExn(Belt_Int.fromString(height))
-                            };
-                            return newrecord$6;
-                        default:
-                          var newrecord$7 = Caml_obj.obj_dup(acc);
-                          newrecord$7.hgt = /* Unknown */0;
-                          return newrecord$7;
-                      }
-                  case "iyr" :
-                      var newrecord$8 = Caml_obj.obj_dup(acc);
-                      newrecord$8.iyr = Belt_Option.getExn(Belt_Int.fromString(value));
-                      return newrecord$8;
-                  case "pid" :
-                      var newrecord$9 = Caml_obj.obj_dup(acc);
-                      newrecord$9.pid = /* Pid */{
-                        _0: value
-                      };
-                      return newrecord$9;
-                  default:
-                    return acc;
-                }
-              }));
-}
-
-function parsePassport(param) {
-  return Belt_Array.map(Belt_Array.map(Input.readFile("input/Week2/Year2020Day4.sample.txt").split("\n\n"), (function (line) {
-                    return line.replace(/\n/g, " ").trim();
-                  })), formatPassportInfoToRecord);
-}
-
-function getPassportWhichFieldAreAllExist(passports) {
-  return Belt_Array.keep(passports, (function (passport) {
-                if (passport.byr > 0 && passport.iyr > 0 && passport.eyr > 0 && passport.hgt !== /* None */1 && passport.hcl !== /* None */0 && passport.ecl !== /* None */8) {
-                  return passport.pid !== /* None */0;
-                } else {
-                  return false;
-                }
+function parseRecordForPart1(passports) {
+  return Belt_Array.map(passports, (function (passport) {
+                return Belt_Array.reduce(passport, {
+                            byr: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            },
+                            iyr: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            },
+                            eyr: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            },
+                            hcl: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            },
+                            hgt: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            },
+                            ecl: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            },
+                            pid: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            },
+                            cid: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            }
+                          }, (function (acc, param) {
+                              var value = param[1];
+                              switch (param[0]) {
+                                case "byr" :
+                                    return {
+                                            byr: {
+                                              TAG: /* Ok */0,
+                                              _0: Belt_Option.getExn(Belt_Int.fromString(value))
+                                            },
+                                            iyr: acc.iyr,
+                                            eyr: acc.eyr,
+                                            hcl: acc.hcl,
+                                            hgt: acc.hgt,
+                                            ecl: acc.ecl,
+                                            pid: acc.pid,
+                                            cid: acc.cid
+                                          };
+                                case "cid" :
+                                    return {
+                                            byr: acc.byr,
+                                            iyr: acc.iyr,
+                                            eyr: acc.eyr,
+                                            hcl: acc.hcl,
+                                            hgt: acc.hgt,
+                                            ecl: acc.ecl,
+                                            pid: acc.pid,
+                                            cid: {
+                                              TAG: /* Ok */0,
+                                              _0: Belt_Option.getExn(Belt_Int.fromString(value))
+                                            }
+                                          };
+                                case "ecl" :
+                                    return {
+                                            byr: acc.byr,
+                                            iyr: acc.iyr,
+                                            eyr: acc.eyr,
+                                            hcl: acc.hcl,
+                                            hgt: acc.hgt,
+                                            ecl: {
+                                              TAG: /* Ok */0,
+                                              _0: value
+                                            },
+                                            pid: acc.pid,
+                                            cid: acc.cid
+                                          };
+                                case "eyr" :
+                                    return {
+                                            byr: acc.byr,
+                                            iyr: acc.iyr,
+                                            eyr: {
+                                              TAG: /* Ok */0,
+                                              _0: Belt_Option.getExn(Belt_Int.fromString(value))
+                                            },
+                                            hcl: acc.hcl,
+                                            hgt: acc.hgt,
+                                            ecl: acc.ecl,
+                                            pid: acc.pid,
+                                            cid: acc.cid
+                                          };
+                                case "hcl" :
+                                    return {
+                                            byr: acc.byr,
+                                            iyr: acc.iyr,
+                                            eyr: acc.eyr,
+                                            hcl: {
+                                              TAG: /* Ok */0,
+                                              _0: value
+                                            },
+                                            hgt: acc.hgt,
+                                            ecl: acc.ecl,
+                                            pid: acc.pid,
+                                            cid: acc.cid
+                                          };
+                                case "hgt" :
+                                    return {
+                                            byr: acc.byr,
+                                            iyr: acc.iyr,
+                                            eyr: acc.eyr,
+                                            hcl: acc.hcl,
+                                            hgt: {
+                                              TAG: /* Ok */0,
+                                              _0: value
+                                            },
+                                            ecl: acc.ecl,
+                                            pid: acc.pid,
+                                            cid: acc.cid
+                                          };
+                                case "iyr" :
+                                    return {
+                                            byr: acc.byr,
+                                            iyr: {
+                                              TAG: /* Ok */0,
+                                              _0: Belt_Option.getExn(Belt_Int.fromString(value))
+                                            },
+                                            eyr: acc.eyr,
+                                            hcl: acc.hcl,
+                                            hgt: acc.hgt,
+                                            ecl: acc.ecl,
+                                            pid: acc.pid,
+                                            cid: acc.cid
+                                          };
+                                case "pid" :
+                                    return {
+                                            byr: acc.byr,
+                                            iyr: acc.iyr,
+                                            eyr: acc.eyr,
+                                            hcl: acc.hcl,
+                                            hgt: acc.hgt,
+                                            ecl: acc.ecl,
+                                            pid: {
+                                              TAG: /* Ok */0,
+                                              _0: value
+                                            },
+                                            cid: acc.cid
+                                          };
+                                default:
+                                  return acc;
+                              }
+                            }));
               }));
 }
 
 function rangeValidator(min, max, value) {
-  if (Caml_obj.greaterequal(value, min)) {
-    return Caml_obj.lessequal(value, max);
+  if (value >= min && value <= max) {
+    return {
+            TAG: /* Ok */0,
+            _0: value
+          };
   } else {
-    return false;
+    return {
+            TAG: /* Error */1,
+            _0: "Invalid range"
+          };
   }
 }
 
-function getPassportWhichValueAreAllValid(passports) {
-  return Belt_Array.keep(passports, (function (passport) {
-                var pid = passport.pid;
-                var hgt = passport.hgt;
-                var hcl = passport.hcl;
-                var tmp = false;
-                if (rangeValidator(1920, 2002, passport.byr) && rangeValidator(2010, 2020, passport.iyr) && rangeValidator(2020, 2030, passport.eyr)) {
-                  var tmp$1;
-                  tmp$1 = typeof hgt === "number" ? false : (
-                      hgt.TAG === /* Cm */0 ? rangeValidator(150, 193, hgt._0) : rangeValidator(59, 76, hgt._0)
-                    );
-                  tmp = tmp$1;
+function parseRecordForPart2(passports) {
+  return Belt_Array.map(passports, (function (passport) {
+                return Belt_Array.reduce(passport, {
+                            byr: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            },
+                            iyr: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            },
+                            eyr: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            },
+                            hcl: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            },
+                            hgt: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            },
+                            ecl: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            },
+                            pid: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            },
+                            cid: {
+                              TAG: /* Error */1,
+                              _0: ""
+                            }
+                          }, (function (acc, param) {
+                              var value = param[1];
+                              switch (param[0]) {
+                                case "byr" :
+                                    return {
+                                            byr: rangeValidator(1920, 2002, Belt_Option.getExn(Belt_Int.fromString(value))),
+                                            iyr: acc.iyr,
+                                            eyr: acc.eyr,
+                                            hcl: acc.hcl,
+                                            hgt: acc.hgt,
+                                            ecl: acc.ecl,
+                                            pid: acc.pid,
+                                            cid: acc.cid
+                                          };
+                                case "cid" :
+                                    return {
+                                            byr: acc.byr,
+                                            iyr: acc.iyr,
+                                            eyr: acc.eyr,
+                                            hcl: acc.hcl,
+                                            hgt: acc.hgt,
+                                            ecl: acc.ecl,
+                                            pid: acc.pid,
+                                            cid: {
+                                              TAG: /* Ok */0,
+                                              _0: Belt_Option.getExn(Belt_Int.fromString(value))
+                                            }
+                                          };
+                                case "ecl" :
+                                    switch (value) {
+                                      case "amb" :
+                                          return {
+                                                  byr: acc.byr,
+                                                  iyr: acc.iyr,
+                                                  eyr: acc.eyr,
+                                                  hcl: acc.hcl,
+                                                  hgt: acc.hgt,
+                                                  ecl: {
+                                                    TAG: /* Ok */0,
+                                                    _0: /* Amb */0
+                                                  },
+                                                  pid: acc.pid,
+                                                  cid: acc.cid
+                                                };
+                                      case "blu" :
+                                          return {
+                                                  byr: acc.byr,
+                                                  iyr: acc.iyr,
+                                                  eyr: acc.eyr,
+                                                  hcl: acc.hcl,
+                                                  hgt: acc.hgt,
+                                                  ecl: {
+                                                    TAG: /* Ok */0,
+                                                    _0: /* Blu */1
+                                                  },
+                                                  pid: acc.pid,
+                                                  cid: acc.cid
+                                                };
+                                      case "brn" :
+                                          return {
+                                                  byr: acc.byr,
+                                                  iyr: acc.iyr,
+                                                  eyr: acc.eyr,
+                                                  hcl: acc.hcl,
+                                                  hgt: acc.hgt,
+                                                  ecl: {
+                                                    TAG: /* Ok */0,
+                                                    _0: /* Brn */6
+                                                  },
+                                                  pid: acc.pid,
+                                                  cid: acc.cid
+                                                };
+                                      case "grn" :
+                                          return {
+                                                  byr: acc.byr,
+                                                  iyr: acc.iyr,
+                                                  eyr: acc.eyr,
+                                                  hcl: acc.hcl,
+                                                  hgt: acc.hgt,
+                                                  ecl: {
+                                                    TAG: /* Ok */0,
+                                                    _0: /* Grn */2
+                                                  },
+                                                  pid: acc.pid,
+                                                  cid: acc.cid
+                                                };
+                                      case "gry" :
+                                          return {
+                                                  byr: acc.byr,
+                                                  iyr: acc.iyr,
+                                                  eyr: acc.eyr,
+                                                  hcl: acc.hcl,
+                                                  hgt: acc.hgt,
+                                                  ecl: {
+                                                    TAG: /* Ok */0,
+                                                    _0: /* Gry */3
+                                                  },
+                                                  pid: acc.pid,
+                                                  cid: acc.cid
+                                                };
+                                      case "hzl" :
+                                          return {
+                                                  byr: acc.byr,
+                                                  iyr: acc.iyr,
+                                                  eyr: acc.eyr,
+                                                  hcl: acc.hcl,
+                                                  hgt: acc.hgt,
+                                                  ecl: {
+                                                    TAG: /* Ok */0,
+                                                    _0: /* Hzl */4
+                                                  },
+                                                  pid: acc.pid,
+                                                  cid: acc.cid
+                                                };
+                                      case "oth" :
+                                          return {
+                                                  byr: acc.byr,
+                                                  iyr: acc.iyr,
+                                                  eyr: acc.eyr,
+                                                  hcl: acc.hcl,
+                                                  hgt: acc.hgt,
+                                                  ecl: {
+                                                    TAG: /* Ok */0,
+                                                    _0: /* Oth */5
+                                                  },
+                                                  pid: acc.pid,
+                                                  cid: acc.cid
+                                                };
+                                      default:
+                                        return {
+                                                byr: acc.byr,
+                                                iyr: acc.iyr,
+                                                eyr: acc.eyr,
+                                                hcl: acc.hcl,
+                                                hgt: acc.hgt,
+                                                ecl: {
+                                                  TAG: /* Error */1,
+                                                  _0: "Invalid ecl"
+                                                },
+                                                pid: acc.pid,
+                                                cid: acc.cid
+                                              };
+                                    }
+                                case "eyr" :
+                                    return {
+                                            byr: acc.byr,
+                                            iyr: acc.iyr,
+                                            eyr: rangeValidator(2020, 2030, Belt_Option.getExn(Belt_Int.fromString(value))),
+                                            hcl: acc.hcl,
+                                            hgt: acc.hgt,
+                                            ecl: acc.ecl,
+                                            pid: acc.pid,
+                                            cid: acc.cid
+                                          };
+                                case "hcl" :
+                                    if (/^#[0-9a-f]{6}$/.test(value)) {
+                                      return {
+                                              byr: acc.byr,
+                                              iyr: acc.iyr,
+                                              eyr: acc.eyr,
+                                              hcl: {
+                                                TAG: /* Ok */0,
+                                                _0: /* Hcl */{
+                                                  _0: value
+                                                }
+                                              },
+                                              hgt: acc.hgt,
+                                              ecl: acc.ecl,
+                                              pid: acc.pid,
+                                              cid: acc.cid
+                                            };
+                                    } else {
+                                      return {
+                                              byr: acc.byr,
+                                              iyr: acc.iyr,
+                                              eyr: acc.eyr,
+                                              hcl: {
+                                                TAG: /* Error */1,
+                                                _0: "Invalid hcl"
+                                              },
+                                              hgt: acc.hgt,
+                                              ecl: acc.ecl,
+                                              pid: acc.pid,
+                                              cid: acc.cid
+                                            };
+                                    }
+                                case "hgt" :
+                                    var unit = value.slice(-2);
+                                    var height = value.slice(0, -2);
+                                    switch (unit) {
+                                      case "cm" :
+                                          return {
+                                                  byr: acc.byr,
+                                                  iyr: acc.iyr,
+                                                  eyr: acc.eyr,
+                                                  hcl: acc.hcl,
+                                                  hgt: Belt_Result.isOk(rangeValidator(150, 193, Belt_Option.getExn(Belt_Int.fromString(height)))) ? ({
+                                                        TAG: /* Ok */0,
+                                                        _0: {
+                                                          TAG: /* Cm */0,
+                                                          _0: Belt_Option.getExn(Belt_Int.fromString(height))
+                                                        }
+                                                      }) : ({
+                                                        TAG: /* Error */1,
+                                                        _0: "Invalid height"
+                                                      }),
+                                                  ecl: acc.ecl,
+                                                  pid: acc.pid,
+                                                  cid: acc.cid
+                                                };
+                                      case "in" :
+                                          return {
+                                                  byr: acc.byr,
+                                                  iyr: acc.iyr,
+                                                  eyr: acc.eyr,
+                                                  hcl: acc.hcl,
+                                                  hgt: Belt_Result.isOk(rangeValidator(59, 76, Belt_Option.getExn(Belt_Int.fromString(height)))) ? ({
+                                                        TAG: /* Ok */0,
+                                                        _0: {
+                                                          TAG: /* In */1,
+                                                          _0: Belt_Option.getExn(Belt_Int.fromString(height))
+                                                        }
+                                                      }) : ({
+                                                        TAG: /* Error */1,
+                                                        _0: "Invalid height"
+                                                      }),
+                                                  ecl: acc.ecl,
+                                                  pid: acc.pid,
+                                                  cid: acc.cid
+                                                };
+                                      default:
+                                        return {
+                                                byr: acc.byr,
+                                                iyr: acc.iyr,
+                                                eyr: acc.eyr,
+                                                hcl: acc.hcl,
+                                                hgt: {
+                                                  TAG: /* Error */1,
+                                                  _0: "Invalid unit"
+                                                },
+                                                ecl: acc.ecl,
+                                                pid: acc.pid,
+                                                cid: acc.cid
+                                              };
+                                    }
+                                case "iyr" :
+                                    return {
+                                            byr: acc.byr,
+                                            iyr: rangeValidator(2010, 2020, Belt_Option.getExn(Belt_Int.fromString(value))),
+                                            eyr: acc.eyr,
+                                            hcl: acc.hcl,
+                                            hgt: acc.hgt,
+                                            ecl: acc.ecl,
+                                            pid: acc.pid,
+                                            cid: acc.cid
+                                          };
+                                case "pid" :
+                                    if (/^[0-9]{9}$/.test(value)) {
+                                      return {
+                                              byr: acc.byr,
+                                              iyr: acc.iyr,
+                                              eyr: acc.eyr,
+                                              hcl: acc.hcl,
+                                              hgt: acc.hgt,
+                                              ecl: acc.ecl,
+                                              pid: {
+                                                TAG: /* Ok */0,
+                                                _0: /* Pid */{
+                                                  _0: value
+                                                }
+                                              },
+                                              cid: acc.cid
+                                            };
+                                    } else {
+                                      return {
+                                              byr: acc.byr,
+                                              iyr: acc.iyr,
+                                              eyr: acc.eyr,
+                                              hcl: acc.hcl,
+                                              hgt: acc.hgt,
+                                              ecl: acc.ecl,
+                                              pid: {
+                                                TAG: /* Error */1,
+                                                _0: "Invalid pid"
+                                              },
+                                              cid: acc.cid
+                                            };
+                                    }
+                                default:
+                                  return acc;
+                              }
+                            }));
+              }));
+}
+
+function splitToKeyAndValue(fields) {
+  return Belt_Array.map(fields.split(" "), (function (field) {
+                var pair = field.split(":");
+                if (pair.length !== 2) {
+                  throw {
+                        RE_EXN_ID: "Invalid_argument",
+                        _1: "Invalid field",
+                        Error: new Error()
+                      };
                 }
-                if (tmp && (
-                    hcl ? /^#[0-9a-f]{6}$/.test(hcl._0) : false
-                  ) && passport.ecl < 7 && pid) {
-                  return /^[0-9]{9}$/.test(pid._0);
+                var key = pair[0];
+                var value = pair[1];
+                return [
+                        key,
+                        value
+                      ];
+              }));
+}
+
+function getInput(param) {
+  return Belt_Array.map(Input.splitLine(Input.readFile("input/Week2/Year2020Day4.sample.txt"), "\n\n"), (function (line) {
+                return splitToKeyAndValue(line.replace(/\n/g, " "));
+              }));
+}
+
+function parsePassport1(param) {
+  return parseRecordForPart1(getInput(undefined));
+}
+
+function parsePassport2(param) {
+  return parseRecordForPart2(getInput(undefined));
+}
+
+function validatePassport1(passports) {
+  return Belt_Array.keep(passports, (function (passport) {
+                if (passport.byr.TAG === /* Ok */0 && passport.iyr.TAG === /* Ok */0 && passport.eyr.TAG === /* Ok */0 && passport.hcl.TAG === /* Ok */0 && passport.hgt.TAG === /* Ok */0 && passport.ecl.TAG === /* Ok */0 && passport.pid.TAG === /* Ok */0) {
+                  return true;
                 } else {
                   return false;
                 }
               }));
 }
 
-function countPassport(passports) {
-  return passports.length;
+function validatePassport2(passports) {
+  return Belt_Array.keep(passports, (function (passport) {
+                if (passport.byr.TAG === /* Ok */0 && passport.iyr.TAG === /* Ok */0 && passport.eyr.TAG === /* Ok */0 && passport.hcl.TAG === /* Ok */0 && passport.hgt.TAG === /* Ok */0 && passport.ecl.TAG === /* Ok */0 && passport.pid.TAG === /* Ok */0) {
+                  return true;
+                } else {
+                  return false;
+                }
+              }));
 }
 
-function solution(part) {
-  var passports = parsePassport(undefined);
-  console.log((
-        part ? getPassportWhichValueAreAllValid(passports) : getPassportWhichFieldAreAllExist(passports)
-      ).length);
-}
+console.log(validatePassport1(parseRecordForPart1(getInput(undefined))).length);
 
-solution(/* Part1 */0);
-
-solution(/* Part2 */1);
+console.log(validatePassport2(parseRecordForPart2(getInput(undefined))).length);
 
 exports.covertTypeToInt = covertTypeToInt;
-exports.formatPassportInfoToRecord = formatPassportInfoToRecord;
-exports.parsePassport = parsePassport;
-exports.getPassportWhichFieldAreAllExist = getPassportWhichFieldAreAllExist;
+exports.parseRecordForPart1 = parseRecordForPart1;
 exports.rangeValidator = rangeValidator;
-exports.getPassportWhichValueAreAllValid = getPassportWhichValueAreAllValid;
-exports.countPassport = countPassport;
-exports.solution = solution;
+exports.parseRecordForPart2 = parseRecordForPart2;
+exports.splitToKeyAndValue = splitToKeyAndValue;
+exports.getInput = getInput;
+exports.parsePassport1 = parsePassport1;
+exports.parsePassport2 = parsePassport2;
+exports.validatePassport1 = validatePassport1;
+exports.validatePassport2 = validatePassport2;
 /*  Not a pure module */

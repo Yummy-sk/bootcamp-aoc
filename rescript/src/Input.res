@@ -17,3 +17,8 @@ let readFile = (path) => {
   Node.Fs.readFileAsUtf8Sync(fullPath)
   ->Js.String2.trim;
 }
+
+let splitLine = (str, ~delim) => {
+  str
+  ->Js.String2.split(delim)
+}

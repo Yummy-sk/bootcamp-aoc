@@ -1,6 +1,7 @@
-// Part 1
+/**  Part 1  */
 
-// 필드의 유무만 판단하면 되기 때문에 애초에 값을 result 타입으로 string으로 구성되도록 하였습니다.
+
+// 필드의 유무만 판단하면 되기 때문에 애초에 값을 result 타입으로 string 또는 int로 구성되도록 하였습니다.
 type passport1 = {
   byr: option<int>,
   iyr: option<int>,
@@ -16,6 +17,8 @@ type passport1 = {
 let covertTypeToInt = (value) =>
   value->Belt.Int.fromString->Belt.Option.getExn
 
+
+// Passport에 대해 레코드로 변환하여 반환하는 코드입니다. for Part1
 let getParsedPassportForPart1 = (passport) => {
   let initialRecord = {
     byr: None,
@@ -55,7 +58,7 @@ let parseRecordForPart1 = (passports) =>
 
 
 
-// Part 2
+/**  Part 2  */
 
 type ecl = 
   Amb | 
@@ -93,6 +96,7 @@ let rangeChecker = (~min, ~max, ~value) => {
 }
 
 
+// Passport에 대해 레코드로 변환하여 반환하는 코드입니다. for Part2
 let getParsedPassportForPart2 = (passport) => {
   let initialRecord = {
     byr: Error(""),
@@ -158,6 +162,7 @@ let getParsedPassportForPart2 = (passport) => {
   })
 }
 
+
 // Part 2를 위한 파서 입니다.
 let parseRecordForPart2 = (passports) => 
   passports
@@ -178,6 +183,7 @@ let splitToKeyAndValue = (fields) =>
     | _ => raise (Invalid_argument("Invalid field"))
     }
   })
+
 
 let getInput = () => {
   Input.readFile("input/Week2/Year2020Day4.sample.txt")

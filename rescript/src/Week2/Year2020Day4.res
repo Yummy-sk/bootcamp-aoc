@@ -2,52 +2,57 @@
 
 // 필드의 유무만 판단하면 되기 때문에 애초에 값을 result 타입으로 string으로 구성되도록 하였습니다.
 type passport1 = {
-  byr: result<int, string>,
-  iyr: result<int, string>,
-  eyr: result<int, string>,
-  hcl: result<string, string>,
-  hgt: result<string, string>,
-  ecl: result<string, string>,
-  pid: result<string, string>,
-  cid: result<int, string>
+  byr: option<int>,
+  iyr: option<int>,
+  eyr: option<int>,
+  hcl: option<string>,
+  hgt: option<string>,
+  ecl: option<string>,
+  pid: option<string>,
+  cid: option<int>
 }
 
 
 let covertTypeToInt = (value) =>
   value->Belt.Int.fromString->Belt.Option.getExn
 
-
-// Part 1을 위한 파서 입니다. 
-let parseRecordForPart1 = (passports) => {
+let getParsedPassportForPart1 = (passport) => {
   let initialRecord = {
-    byr: Error(""),
-    iyr: Error(""),
-    eyr: Error(""),
-    hcl: Error(""),
-    hgt: Error(""),
-    ecl: Error(""),
-    pid: Error(""),
-    cid: Error("")
+    byr: None,
+    iyr: None,
+    eyr: None,
+    hcl: None,
+    hgt: None,
+    ecl: None,
+    pid: None,
+    cid: None
   }
 
+  passport
+  ->Belt.Array.reduce(initialRecord, (acc, (key, value)) => {
+    switch key {
+    | "byr" => { ...acc, byr: Some(value->covertTypeToInt) }
+    | "iyr" => { ...acc, iyr: Some(value->covertTypeToInt) }
+    | "eyr" => { ...acc, eyr: Some(value->covertTypeToInt) }
+    | "hcl" => { ...acc, hcl: Some(value) }
+    | "hgt" => { ...acc, hgt: Some(value) }
+    | "ecl" => { ...acc, ecl: Some(value) }
+    | "pid" => { ...acc, pid: Some(value) }
+    | "cid" => { ...acc, cid: Some(value->covertTypeToInt) }
+    | _ => acc
+    }
+  })
+}
+
+
+// Part 1을 위한 파서 입니다. 
+let parseRecordForPart1 = (passports) => 
   passports
   ->Belt.Array.map((passport) => {
     passport
-    ->Belt.Array.reduce(initialRecord, (acc, (key, value)) => {
-      switch key {
-      | "byr" => { ...acc, byr: Ok(value->covertTypeToInt) }
-      | "iyr" => { ...acc, iyr: Ok(value->covertTypeToInt) }
-      | "eyr" => { ...acc, eyr: Ok(value->covertTypeToInt) }
-      | "hcl" => { ...acc, hcl: Ok(value) }
-      | "hgt" => { ...acc, hgt: Ok(value) }
-      | "ecl" => { ...acc, ecl: Ok(value) }
-      | "pid" => { ...acc, pid: Ok(value) }
-      | "cid" => { ...acc, cid: Ok(value->covertTypeToInt) }
-      | _ => acc
-      }
-    })
+    ->getParsedPassportForPart1
   })
-}
+
 
 
 // Part 2
@@ -88,9 +93,7 @@ let rangeValidator = (~min: int, ~max: int, ~value: 'a) => {
 }
 
 
-// Part 2를 위한 파서 입니다.
-let parseRecordForPart2 = (passports) => {
-
+let getParsedPassportForPart2 = (passport) => {
   let initialRecord = {
     byr: Error(""),
     iyr: Error(""),
@@ -102,10 +105,8 @@ let parseRecordForPart2 = (passports) => {
     cid: Error("")
   }
 
-  passports
-  ->Belt.Array.map((passport) => {
-    passport
-    ->Belt.Array.reduce(initialRecord, (acc, (key, value)) => {
+  passport
+  ->Belt.Array.reduce(initialRecord, (acc, (key, value)) => {
       switch key {
       | "byr" => { ...acc, byr: rangeValidator(~min=1920, ~max=2002, ~value=value->covertTypeToInt) }
       | "iyr" => { ...acc, iyr: rangeValidator(~min=2010, ~max=2020, ~value=value->covertTypeToInt) }
@@ -156,9 +157,17 @@ let parseRecordForPart2 = (passports) => {
       | "cid" => { ...acc, cid: Ok(value->covertTypeToInt) }
       | _ => acc
     }
-    })
   })
 }
+
+// Part 2를 위한 파서 입니다.
+let parseRecordForPart2 = (passports) => 
+  passports
+  ->Belt.Array.map((passport) => {
+    passport
+    ->getParsedPassportForPart2
+  })
+
 
 let splitToKeyAndValue = (fields) => 
   fields
@@ -199,9 +208,11 @@ type validatePassport1 = (array<passport1>) => array<passport1>
 let validatePassport1: validatePassport1 = (passports) => {
   passports
   ->Belt.Array.keep(passport => {
-    switch passport {
-    | {byr: Ok(_), iyr: Ok(_), eyr: Ok(_), hcl: Ok(_), hgt: Ok(_), ecl: Ok(_), pid: Ok(_), _} => true
-    | _ => false
+    let {byr, iyr, eyr, hcl, hgt, ecl, pid} = passport;
+
+    switch (byr, iyr, eyr, hcl, hgt, ecl, pid) {
+      | (Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) => true
+      | _ => false
     }
   })
 }

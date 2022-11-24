@@ -85,7 +85,7 @@ type passport2 = {
 }
 
 
-let rangeValidator = (~min: int, ~max: int, ~value: 'a) => {
+let rangeChecker = (~min, ~max, ~value) => {
   switch (value >= min && value <= max) {
   | true => Ok(value)
   | false => Error("Invalid range")
@@ -108,9 +108,9 @@ let getParsedPassportForPart2 = (passport) => {
   passport
   ->Belt.Array.reduce(initialRecord, (acc, (key, value)) => {
       switch key {
-      | "byr" => { ...acc, byr: rangeValidator(~min=1920, ~max=2002, ~value=value->covertTypeToInt) }
-      | "iyr" => { ...acc, iyr: rangeValidator(~min=2010, ~max=2020, ~value=value->covertTypeToInt) }
-      | "eyr" => { ...acc, eyr: rangeValidator(~min=2020, ~max=2030, ~value=value->covertTypeToInt) }
+      | "byr" => { ...acc, byr: rangeChecker(~min=1920, ~max=2002, ~value=value->covertTypeToInt) }
+      | "iyr" => { ...acc, iyr: rangeChecker(~min=2010, ~max=2020, ~value=value->covertTypeToInt) }
+      | "eyr" => { ...acc, eyr: rangeChecker(~min=2020, ~max=2030, ~value=value->covertTypeToInt) }
       | "hcl" => {
         switch (Js.Re.test_(%re("/^#[0-9a-f]{6}$/"), value)) {
         | true => { ...acc, hcl: Ok(Hcl(value)) }
@@ -123,15 +123,13 @@ let getParsedPassportForPart2 = (passport) => {
         switch unit {
         | "cm" => { 
           ...acc, 
-          hgt: rangeValidator(~min=150, ~max=193, ~value=height->covertTypeToInt)
-               ->Belt.Result.isOk // rangeValidator의 결과가 Ok라면, hgt의 타입을 Cm으로 감싼 OK를, 아니라면 Error를 반환합니다.
-                ? Ok(Cm(height->covertTypeToInt)) : Error("Invalid height") 
+          hgt: rangeChecker(~min=150, ~max=193, ~value=height->covertTypeToInt)
+               ->Belt.Result.map((height) => In(height))
           }
         | "in" => { 
           ...acc, 
-          hgt: rangeValidator(~min=59, ~max=76, ~value=height->covertTypeToInt)
-               ->Belt.Result.isOk // rangeValidator의 결과가 Ok라면, hgt의 타입을 Cm으로 감싼 OK를, 아니라면 Error를 반환합니다.
-                ? Ok(In(height->covertTypeToInt)) : Error("Invalid height") 
+          hgt: rangeChecker(~min=59, ~max=76, ~value=height->covertTypeToInt)
+                ->Belt.Result.map((height) => In(height))
         }
         | _ => { ...acc, hgt: Error("Invalid unit") }
         }

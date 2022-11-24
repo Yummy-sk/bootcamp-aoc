@@ -3,6 +3,7 @@
 
 var Input = require("../Input.js");
 var Belt_Int = require("rescript/lib/js/belt_Int.js");
+var Caml_obj = require("rescript/lib/js/caml_obj.js");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
 var Belt_Result = require("rescript/lib/js/belt_Result.js");
@@ -122,8 +123,8 @@ function parseRecordForPart1(passports) {
   return Belt_Array.map(passports, getParsedPassportForPart1);
 }
 
-function rangeValidator(min, max, value) {
-  if (value >= min && value <= max) {
+function rangeChecker(min, max, value) {
+  if (Caml_obj.greaterequal(value, min) && Caml_obj.lessequal(value, max)) {
     return {
             TAG: /* Ok */0,
             _0: value
@@ -175,7 +176,7 @@ function getParsedPassportForPart2(passport) {
                 switch (param[0]) {
                   case "byr" :
                       return {
-                              byr: rangeValidator(1920, 2002, Belt_Option.getExn(Belt_Int.fromString(value))),
+                              byr: rangeChecker(1920, 2002, Belt_Option.getExn(Belt_Int.fromString(value))),
                               iyr: acc.iyr,
                               eyr: acc.eyr,
                               hcl: acc.hcl,
@@ -317,7 +318,7 @@ function getParsedPassportForPart2(passport) {
                       return {
                               byr: acc.byr,
                               iyr: acc.iyr,
-                              eyr: rangeValidator(2020, 2030, Belt_Option.getExn(Belt_Int.fromString(value))),
+                              eyr: rangeChecker(2020, 2030, Belt_Option.getExn(Belt_Int.fromString(value))),
                               hcl: acc.hcl,
                               hgt: acc.hgt,
                               ecl: acc.ecl,
@@ -366,16 +367,12 @@ function getParsedPassportForPart2(passport) {
                                     iyr: acc.iyr,
                                     eyr: acc.eyr,
                                     hcl: acc.hcl,
-                                    hgt: Belt_Result.isOk(rangeValidator(150, 193, Belt_Option.getExn(Belt_Int.fromString(height)))) ? ({
-                                          TAG: /* Ok */0,
-                                          _0: {
-                                            TAG: /* Cm */0,
-                                            _0: Belt_Option.getExn(Belt_Int.fromString(height))
-                                          }
-                                        }) : ({
-                                          TAG: /* Error */1,
-                                          _0: "Invalid height"
-                                        }),
+                                    hgt: Belt_Result.map(rangeChecker(150, 193, Belt_Option.getExn(Belt_Int.fromString(height))), (function (height) {
+                                            return {
+                                                    TAG: /* In */1,
+                                                    _0: height
+                                                  };
+                                          })),
                                     ecl: acc.ecl,
                                     pid: acc.pid,
                                     cid: acc.cid
@@ -386,16 +383,12 @@ function getParsedPassportForPart2(passport) {
                                     iyr: acc.iyr,
                                     eyr: acc.eyr,
                                     hcl: acc.hcl,
-                                    hgt: Belt_Result.isOk(rangeValidator(59, 76, Belt_Option.getExn(Belt_Int.fromString(height)))) ? ({
-                                          TAG: /* Ok */0,
-                                          _0: {
-                                            TAG: /* In */1,
-                                            _0: Belt_Option.getExn(Belt_Int.fromString(height))
-                                          }
-                                        }) : ({
-                                          TAG: /* Error */1,
-                                          _0: "Invalid height"
-                                        }),
+                                    hgt: Belt_Result.map(rangeChecker(59, 76, Belt_Option.getExn(Belt_Int.fromString(height))), (function (height) {
+                                            return {
+                                                    TAG: /* In */1,
+                                                    _0: height
+                                                  };
+                                          })),
                                     ecl: acc.ecl,
                                     pid: acc.pid,
                                     cid: acc.cid
@@ -418,7 +411,7 @@ function getParsedPassportForPart2(passport) {
                   case "iyr" :
                       return {
                               byr: acc.byr,
-                              iyr: rangeValidator(2010, 2020, Belt_Option.getExn(Belt_Int.fromString(value))),
+                              iyr: rangeChecker(2010, 2020, Belt_Option.getExn(Belt_Int.fromString(value))),
                               eyr: acc.eyr,
                               hcl: acc.hcl,
                               hgt: acc.hgt,
@@ -534,7 +527,7 @@ console.log(validatePassport2(Belt_Array.map(passports$1, getParsedPassportForPa
 exports.covertTypeToInt = covertTypeToInt;
 exports.getParsedPassportForPart1 = getParsedPassportForPart1;
 exports.parseRecordForPart1 = parseRecordForPart1;
-exports.rangeValidator = rangeValidator;
+exports.rangeChecker = rangeChecker;
 exports.getParsedPassportForPart2 = getParsedPassportForPart2;
 exports.parseRecordForPart2 = parseRecordForPart2;
 exports.splitToKeyAndValue = splitToKeyAndValue;
